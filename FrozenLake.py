@@ -54,7 +54,7 @@ for i in range(0, 100000):
 
         next_state, rew, done, info = env.step(action)
         if done and (rew == 0.0):
-            rew = -1.0
+            rew = -2.0
 
         #Update Q table with reward
         new_q = Q[state, action] + alpha * (rew + gamma * np.max(Q[next_state]) - Q[state, action])
