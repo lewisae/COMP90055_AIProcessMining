@@ -5,8 +5,9 @@ https://gym.openai.com/docs/
 
 The code for the Q-learning agent is based off of the following resources:
 COMP90054 online textbook: https://gibberblot.github.io/rl-notes/single-agent/model-free.html
+Sutton and Barto, Reinforcement Learning: http://incompleteideas.net/book/ebook/
 https://www.simplilearn.com/tutorials/machine-learning-tutorial/what-is-q-learning
-https://www.learndatasci.com/tutorials/reinforcement-q-learning-scratch-python-openai-gym/
+https://medium.com/@james_32022/frozen-lake-with-q-learning-4038b804abc1
 '''
 
 import gym
@@ -26,18 +27,22 @@ Q = np.zeros([env.observation_space.n, env.action_space.n])
 G = 0
 
 #Learning rate
-alpha = 0.1
+alpha = 0.8
 
 #Reward discount factor
-gamma = 0.6
+gamma = 0.9
 
 #Exploration/exploitation constant
-epsilon = 0.2
+epsilon = 0.15
 
-for i in range(0, 100000):
+#Number of episodes to train model
+num_eps = 10000
+
+for i in range(0, num_eps):
     state = env.reset()
 
     done = False
+    rew = 0.0
 
     while not done:
 
@@ -45,22 +50,24 @@ for i in range(0, 100000):
         if random.random() < epsilon:
             #Choose a random action
             action = env.action_space.sample()
-            print("Explore: " + str(action))
         else:
             #Trace a path we have done before
-            action = np.argmax(Q[state])
-            print("Exploit:" + str(action))
-
+            action = np.argmax(Q[state, :])
 
         next_state, rew, done, info = env.step(action)
-        if done and (rew == 0.0):
-            rew = -2.0
+        if done and rew < 1:
+            rew = -1.0
 
         #Update Q table with reward
         new_q = Q[state, action] + alpha * (rew + gamma * np.max(Q[next_state]) - Q[state, action])
         Q[state, action] = new_q
 
         state = next_state
-        print(Q)
 
         env.render()
+
+    if rew > 0.0:
+        print("Win")
+        print(i)
+    else:
+        print("Lose")
