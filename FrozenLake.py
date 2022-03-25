@@ -45,10 +45,12 @@ epsilon = 0.15
 #Number of episodes to train model
 num_eps = 10000
 
+#To keep track of wins and losses
+wins = 0
+losses = 0
+
 for i in range(0, num_eps):
     log.write("Beginning episode: " + str(i) + "\n")
-    wins = 0
-    losses = 0
     state = env.reset()
 
     done = False
@@ -77,6 +79,7 @@ for i in range(0, num_eps):
 
         state = next_state
 
+        #If you want to show the game as it is being played
         env.render()
 
     if rew > 0.0:
@@ -86,8 +89,8 @@ for i in range(0, num_eps):
         losses += 1
         log.write("Lose\n")
 
-log.write("Total wins for episode " + str(i) + " = " + str(wins) + "\n")
-log.write("Total losses for episode " + str(i) + " = " + str(losses) + "\n")
+log.write("Total wins = " + str(wins) + "\n")
+log.write("Total losses = " + str(losses) + "\n")
 
 #Close the log file
 log.close()
