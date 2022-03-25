@@ -14,10 +14,17 @@ https://www.learndatasci.com/tutorials/reinforcement-q-learning-scratch-python-o
 import gym
 import numpy as np
 import random
+from datetime import datetime
 
 #Build gym environment
 env = gym.make('Taxi-v3')
 env.reset()
+
+# Open file in specified log location
+log_loc = "/home/audrey/Documents/90055_ResearchProject/openAI_sandbox/logs/"
+filename = log_loc + "Taxi-" + datetime.now().strftime("%d-%m-%Y-%H:%M:%S") + ".txt"
+
+log = open(filename, "w")
 
 done = False
 
@@ -40,6 +47,9 @@ epsilon = 0.15
 num_eps = 100000
 
 for i in range(0, num_eps):
+    log.write("Beginning episode: " + str(i) + "\n")
+    wins = 0
+    losses = 0
     state = env.reset()
 
     done = False
@@ -56,6 +66,9 @@ for i in range(0, num_eps):
             action = np.argmax(Q[state, :])
 
         next_state, rew, done, info = env.step(action)
+
+        log.write(str(state) + "," + str(action) + ":" + str(next_state) + "," + str(rew) + "," + str(done) + "," + str(info) + "\n")
+
         if done and rew < 1:
             rew = -1.0
 
@@ -65,10 +78,18 @@ for i in range(0, num_eps):
 
         state = next_state
 
+        #If you want to show the game as it is being played
         env.render()
 
     if rew > 0.0:
-        print("Win")
-        print(i)
+        wins += 1
+        log.write("Win\n")
     else:
-        print("Lose")
+        losses += 1
+        log.write("Lose\n")
+
+log.write("Total wins for episode " + str(i) + " = " + str(wins) + "\n")
+log.write("Total losses for episode " + str(i) + " = " + str(losses) + "\n")
+
+# Close the log file
+log.close()

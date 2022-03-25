@@ -14,7 +14,9 @@ https://keon.github.io/deep-q-learning/
 import gym
 import numpy as np
 import random
-from keras import Sequential, Dense, Adam
+from keras.models import Sequential
+from keras.layers import Dense
+
 
 #Build gym environment - this is using the Discrete version of Lunar Lander
 env = gym.make('ALE/Tetris-v5')
@@ -45,11 +47,11 @@ num_eps = 10000
 #Build Sequential NN model using Keras
 model = Sequential()
 
-model.add(Dense(24, input_dim = env.observation_space.shape[0]*env.observation_space.shape[1]*env.observation_space.shape[2], activation="relu"))
+model.add(Dense(24, input_dim=env.observation_space.shape[0]*env.observation_space.shape[1]*env.observation_space.shape[2], activation="relu"))
 model.add(Dense(24, activation="relu"))
-model.add(Dense(24, env.action_space.n, activation="Linear"))
+model.add(Dense(env.action_space.n, activation="linear"))
 
-model.compile(loss="mse", optimizer=Adam(lr=alpha))
+model.compile(loss="mse", optimizer="adam")
 
 for i in range(0, num_eps):
     state = env.reset()
@@ -64,8 +66,8 @@ for i in range(0, num_eps):
             #Choose a random action
             action = env.action_space.sample()
         else:
-            #Trace a path we have done before
-            action = np.argmax(Q[state, :])
+            #Trace a path we have done before using the model
+            action = np.argmax(model.predict(state)[0])
             #If the action is not in the env action space, pick randomly again
             if action not in env.action_space:
                 action = env.action_space.sample()

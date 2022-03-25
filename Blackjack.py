@@ -14,12 +14,19 @@ https://www.cs.ou.edu/~granville/paper.pdf
 import gym
 import numpy as np
 import random
+from datetime import datetime
 
 #Build gym environment
 env = gym.make('Blackjack-v1')
 env.reset()
 
 done = False
+
+#Open file in specified log location
+log_loc = "/home/audrey/Documents/90055_ResearchProject/openAI_sandbox/logs/"
+filename = log_loc + "Blackjack-" + datetime.now().strftime("%d-%m-%Y-%H:%M:%S") + ".txt"
+
+log = open(filename, "w")
 
 #Set up Q table for learning agent - it will be an n x m table where n = number of states and m = number of actions
 Q = np.zeros([env.observation_space[0].n, env.observation_space[1].n, env.observation_space[2].n, env.action_space.n])
@@ -40,6 +47,9 @@ epsilon = 0.9
 num_eps = 10000
 
 for i in range(0, num_eps):
+    log.write("Beginning episode: " + str(i) + "\n")
+    wins = 0
+    losses = 0
     state = env.reset()
 
     done = False
@@ -59,8 +69,8 @@ for i in range(0, num_eps):
                 action = env.action_space.sample()
 
         next_state, rew, done, info = env.step(action)
-        if done and rew < 1:
-            rew = -1.0
+
+        log.write(str(state) + "," + str(action) + ":" + str(next_state) + "," + str(rew) + "," + str(done) + "," + str(info) + "\n")
 
         #Update Q table with reward
         #The state will be in the format of a 3-parameter tuple, represesting the current player value, the card shown
@@ -75,7 +85,14 @@ for i in range(0, num_eps):
         env.render()
 
     if rew > 0.0:
-        print("Win")
-        print(i)
+        wins += 1
+        log.write("Win\n")
     else:
-        print("Lose")
+        losses += 1
+        log.write("Lose\n")
+
+log.write("Total wins for episode " + str(i) + " = " + str(wins) + "\n")
+log.write("Total losses for episode " + str(i) + " = " + str(losses) + "\n")
+
+#Close the log file
+log.close()
