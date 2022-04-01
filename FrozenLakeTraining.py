@@ -13,25 +13,17 @@ https://medium.com/@james_32022/frozen-lake-with-q-learning-4038b804abc1
 import gym
 import numpy as np
 import random
-from datetime import datetime
+import LogOperations as logging
+
+#Environment is Frozen Lake
+ENV_NAME = "FrozenLake"
 
 #Build gym environment
 env = gym.make('FrozenLake-v1', is_slippery=False)
-env.reset()
 
-done = False
-
-#Open file in specified log location
-log_loc = "/home/audrey/Documents/90055_ResearchProject/openAI_sandbox/logs/"
-filename = log_loc + "FrozenLake-" + datetime.now().strftime("%d-%m-%Y-%H:%M:%S") + ".txt"
-
-log = open(filename, "w")
-
-#Open and store Q-table file
-q_loc = "/home/audrey/Documents/90055_ResearchProject/openAI_sandbox/q_tables/"
-q_name = q_loc + "FrozenLake" + ".txt"
-
-q_file = open(q_name, "w")
+#Open logging and q table files
+log = logging.open_log(ENV_NAME)
+q_file = logging.open_q(ENV_NAME)
 
 #Set up Q table for learning agent - it will be an n x m table where n = number of states and m = number of actions
 Q = np.zeros([env.observation_space.n, env.action_space.n])
@@ -54,61 +46,56 @@ num_eps = 10000
 wins = 0
 losses = 0
 
-for i in range(0, num_eps):
-    log.write("Beginning episode: " + str(i) + "\n")
-    state = env.reset()
+def select_action():
+    # Check for exploration vs. exploitation agiainst epsilon
+    if random.random() < epsilon:
+        # Choose a random action
+        action = env.action_space.sample()
+    else:
+        # If the Q table is all zeroes, choose randomly - else choose max (this is for speed of training),
+        if np.max(Q[state, :]) > 0:
+            action = np.argmax(Q[state, :])
+        else:
+            action = env.action_space.sample()
+    return action
 
+def update(state, next_state, action, rew):
+    # Update Q table with reward
+    current = Q[state, action]
+    Q[state, action] = current + alpha * ((rew + gamma * np.max(Q[next_state, :])) - current)
+
+
+for i in range(0, num_eps):
+    #Reset the environment for a new episode
+    state = env.reset()
     done = False
     rew = 0.0
 
+    #Decaying the epsilon rate as the episodes continue - so we exploit paths we have already taken
     if i % 100 == 0 and epsilon > min_epsilon:
         epsilon *= decay_rate
 
     while not done:
-
-        #Check for exploration vs. exploitation agiainst epsilon
-        if random.random() < epsilon:
-            #Choose a random action
-            action = env.action_space.sample()
-        else:
-            #If the Q table is all zeroes (this is for speed of training)
-            if np.max(Q[state, :]) > 0:
-                action = np.argmax(Q[state, :])
-            else:
-                action = env.action_space.sample()
-
+        #Select an action using epsilon greedy strategy and then execute a step in the environment
+        action = select_action()
         next_state, rew, done, info = env.step(action)
 
+        #Negative reinforcement - if we have fallen into a hole, the reward is -1 (to trace good and bad paths)
         if done and rew == 0.0:
             rew = -1.0
 
-        log.write(str(state) + "," + str(action) + ":" + str(next_state) + "," + str(rew) + "," + str(done) + "\n")
+        #write log with case/event/action information
+        write_log(log, i, action)
 
-        #Update Q table with reward
-        predict = Q[state, action]
-        target = rew + gamma * np.max(Q[next_state, :])
-        Q[state, action] = Q[state, action] + alpha * (target - predict)
+        #Update the Q table with the results of this action
+        update(state, next_state, action, rew)
 
+        #Move to the next state
         state = next_state
-
 
         #If you want to show the game as it is being played (much slower)
         #env.render()
 
-    if rew > 0.0:
-        wins += 1
-        log.write("Win\n")
-    else:
-        losses += 1
-        log.write("Lose\n")
-
-    #To view change over time
-    if i%100 == 0:
-        log.write(str(wins) + " at " + str(i) + " games\n")
-        print(str(wins) + " at " + str(i) + " games\n")
-
-log.write("Total wins = " + str(wins) + "\n")
-log.write("Total losses = " + str(losses) + "\n")
 
 q_file.write(str(Q))
 
