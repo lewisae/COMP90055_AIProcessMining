@@ -27,6 +27,12 @@ filename = log_loc + "FrozenLake-" + datetime.now().strftime("%d-%m-%Y-%H:%M:%S"
 
 log = open(filename, "w")
 
+#Open and store Q-table file
+q_loc = "/home/audrey/Documents/90055_ResearchProject/openAI_sandbox/q_tables/"
+q_name = q_loc + "FrozenLake" + ".txt"
+
+q_file = open(q_name, "w")
+
 #Set up Q table for learning agent - it will be an n x m table where n = number of states and m = number of actions
 Q = np.zeros([env.observation_space.n, env.action_space.n])
 
@@ -73,6 +79,9 @@ for i in range(0, num_eps):
 
         next_state, rew, done, info = env.step(action)
 
+        if done and rew == 0.0:
+            rew = -1.0
+
         log.write(str(state) + "," + str(action) + ":" + str(next_state) + "," + str(rew) + "," + str(done) + "\n")
 
         #Update Q table with reward
@@ -84,7 +93,7 @@ for i in range(0, num_eps):
 
 
         #If you want to show the game as it is being played (much slower)
-        env.render()
+        #env.render()
 
     if rew > 0.0:
         wins += 1
@@ -101,8 +110,9 @@ for i in range(0, num_eps):
 log.write("Total wins = " + str(wins) + "\n")
 log.write("Total losses = " + str(losses) + "\n")
 
+q_file.write(str(Q))
+
 #Close the log file
 log.close()
-
-#Print the Q table
-print(Q)
+#Close the Q file
+q_file.close()
