@@ -7,7 +7,8 @@ The code for the Q-learning agent is based off of the following resources:
 COMP90054 online textbook: https://gibberblot.github.io/rl-notes/single-agent/model-free.html
 Sutton and Barto, Reinforcement Learning: http://incompleteideas.net/book/ebook/
 https://www.simplilearn.com/tutorials/machine-learning-tutorial/what-is-q-learning
-https://medium.com/@james_32022/frozen-lake-with-q-learning-4038b804abc1
+https://www.learndatasci.com/tutorials/reinforcement-q-learning-scratch-python-openai-gym/
+
 '''
 
 import gym
@@ -15,11 +16,11 @@ import numpy as np
 import LogOperations as logging
 import QOperations as ops
 
-#Environment is Frozen Lake
-ENV_NAME = "FrozenLake"
+#Environment is Taxi
+ENV_NAME = "Taxi"
 
 #Build gym environment
-env = gym.make('FrozenLake-v1', is_slippery=False)
+env = gym.make('Taxi-v3')
 
 #Open logging and q table files
 log = logging.open_log(ENV_NAME, training=True)

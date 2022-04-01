@@ -7,7 +7,8 @@ The code for the Q-learning agent is based off of the following resources:
 COMP90054 online textbook: https://gibberblot.github.io/rl-notes/single-agent/model-free.html
 Sutton and Barto, Reinforcement Learning: http://incompleteideas.net/book/ebook/
 https://www.simplilearn.com/tutorials/machine-learning-tutorial/what-is-q-learning
-https://medium.com/@james_32022/frozen-lake-with-q-learning-4038b804abc1
+https://towardsdatascience.com/playing-blackjack-using-model-free-reinforcement-learning-in-google-colab-aa2041a2c13d
+https://www.cs.ou.edu/~granville/paper.pdf
 '''
 
 import gym
@@ -15,18 +16,18 @@ import numpy as np
 import LogOperations as logging
 import QOperations as ops
 
-#Environment is Frozen Lake
-ENV_NAME = "FrozenLake"
+#Environment is Blackjack
+ENV_NAME = "Blackjack"
 
 #Build gym environment
-env = gym.make('FrozenLake-v1', is_slippery=False)
+env = gym.make('Blackjack-v1')
 
 #Open logging and q table files
 log = logging.open_log(ENV_NAME, training=True)
 q_file = logging.open_q(ENV_NAME)
 
 #Set up Q table for learning agent - it will be an n x m table where n = number of states and m = number of actions
-Q = np.zeros([env.observation_space.n, env.action_space.n])
+Q = np.zeros([env.observation_space[0].n, env.observation_space[1].n, env.observation_space[2].n, env.action_space.n])
 
 #Learning rate
 alpha = 0.8
