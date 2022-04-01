@@ -16,7 +16,7 @@ import random
 from datetime import datetime
 
 #Build gym environment
-env = gym.make('FrozenLake-v1')
+env = gym.make('FrozenLake-v1', is_slippery=False)
 env.reset()
 
 done = False
@@ -30,17 +30,16 @@ log = open(filename, "w")
 #Set up Q table for learning agent - it will be an n x m table where n = number of states and m = number of actions
 Q = np.zeros([env.observation_space.n, env.action_space.n])
 
-#Total accumulated reward
-G = 0
-
 #Learning rate
 alpha = 0.8
 
 #Reward discount factor
-gamma = 0.9
+gamma = 0.99
 
 #Exploration/exploitation constant
-epsilon = 0.15
+epsilon = 0.1
+decay_rate = 0.9
+min_epsilon = 0.001
 
 #Number of episodes to train model
 num_eps = 10000
@@ -56,6 +55,9 @@ for i in range(0, num_eps):
     done = False
     rew = 0.0
 
+    if i % 100 == 0 and epsilon > min_epsilon:
+        epsilon *= decay_rate
+
     while not done:
 
         #Check for exploration vs. exploitation agiainst epsilon
@@ -63,23 +65,25 @@ for i in range(0, num_eps):
             #Choose a random action
             action = env.action_space.sample()
         else:
-            #Trace a path we have done before
-            action = np.argmax(Q[state, :])
+            #If the Q table is all zeroes (this is for speed of training)
+            if np.max(Q[state, :]) > 0:
+                action = np.argmax(Q[state, :])
+            else:
+                action = env.action_space.sample()
 
         next_state, rew, done, info = env.step(action)
 
-        log.write(str(state) + "," + str(action) + ":" + str(next_state) + "," + str(rew) + "," + str(done) + "," + str(info) + "\n")
-
-        if done and rew < 1:
-            rew = -1.0
+        log.write(str(state) + "," + str(action) + ":" + str(next_state) + "," + str(rew) + "," + str(done) + "\n")
 
         #Update Q table with reward
-        new_q = Q[state, action] + alpha * (rew + gamma * np.max(Q[next_state]) - Q[state, action])
-        Q[state, action] = new_q
+        predict = Q[state, action]
+        target = rew + gamma * np.max(Q[next_state, :])
+        Q[state, action] = Q[state, action] + alpha * (target - predict)
 
         state = next_state
 
-        #If you want to show the game as it is being played
+
+        #If you want to show the game as it is being played (much slower)
         env.render()
 
     if rew > 0.0:
@@ -89,8 +93,16 @@ for i in range(0, num_eps):
         losses += 1
         log.write("Lose\n")
 
+    #To view change over time
+    if i%100 == 0:
+        log.write(str(wins) + " at " + str(i) + " games\n")
+        print(str(wins) + " at " + str(i) + " games\n")
+
 log.write("Total wins = " + str(wins) + "\n")
 log.write("Total losses = " + str(losses) + "\n")
 
 #Close the log file
 log.close()
+
+#Print the Q table
+print(Q)
