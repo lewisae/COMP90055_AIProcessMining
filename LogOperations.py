@@ -1,7 +1,7 @@
 #This file contains all of the logging operations used across the project - each environment will use the same logging
 #structure and formatting
 
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 
 #Log location and q-table file location - change depending on system (right now just storing locally)
 LOG_LOC = "/home/audrey/Documents/90055_ResearchProject/openAI_sandbox/logs/"
@@ -13,7 +13,7 @@ def open_log(env_name, training=False):
     # Open file in specified log location
     if training:
         env_name += "Training"
-    filename = f'{LOG_LOC}{env_name}{datetime.now().strftime("-%Y-%m-%d-T%H:%M:%S")}.txt'
+    filename = f'{LOG_LOC}{env_name}{datetime.now().strftime("-%Y-%m-%d-T%H:%M:%S")}.csv'
     log = open(filename, "w")
     return log
 
@@ -25,6 +25,8 @@ def open_q(env_name):
 
 #write_log: writes to the given log file in csv format
 def write_log(log, episode_index, action):
-    current_time = datetime.now().strftime("%Y-%m-%d-T%H:%M:%S.%f")
-    log.write(f'{episode_index},{action},{current_time}')
+    #Get the current time
+    current_time = datetime.now(tz=timezone(offset=timedelta(hours=10))).isoformat()
+    #Write info (including current timestamp) to the log file
+    log.write(f'{episode_index},{action},{current_time}\n')
 

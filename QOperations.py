@@ -7,7 +7,9 @@ import LogOperations as logging
 #Using a decaying value of epsilon as i increases, until it reaches a minimum epsilon rate
 def decay_epsilon(i, epsilon, min_epsilon, decay_rate):
     if i % 100 == 0 and epsilon > min_epsilon:
-        epsilon *= decay_rate
+        return epsilon * decay_rate
+    else:
+        return epsilon
 
 #select_action uses an epsilon-greedy strategy to choose an action
 def select_action(Q, env, epsilon, state):
@@ -39,7 +41,7 @@ def train_learner(Q, env, log, q_file, num_eps, epsilon, min_epsilon, decay_rate
         rew = 0.0
 
         # Decaying the epsilon rate as the episodes continue - so we exploit paths we have already taken
-        decay_epsilon(i, epsilon, min_epsilon, decay_rate)
+        epsilon = decay_epsilon(i, epsilon, min_epsilon, decay_rate)
 
         while not done:
             #Select an action using epsilon greedy strategy and then execute a step in the environment
@@ -64,5 +66,5 @@ def train_learner(Q, env, log, q_file, num_eps, epsilon, min_epsilon, decay_rate
 
             #If you want to show the game as it is being played (much slower)
             #env.render()
-
+            
     q_file.write(str(Q))
