@@ -15,6 +15,7 @@ def open_log(env_name, training=False):
         env_name += "Training"
     filename = f'{LOG_LOC}{env_name}{datetime.now().strftime("-%Y-%m-%d-T%H:%M:%S")}.csv'
     log = open(filename, "w")
+    log.write("Index,Action,Timestamp\n")
     return log
 
 #open_q: opens and returns a file object to store the Q table for a given env name (str) at the specified location (Q_LOC)
