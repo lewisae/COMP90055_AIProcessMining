@@ -4,6 +4,8 @@
 from datetime import datetime, timezone, timedelta
 
 #Log location and q-table file location - change depending on system (right now just storing locally)
+import numpy as np
+
 LOG_LOC = "/home/audrey/Documents/90055_ResearchProject/openAI_sandbox/logs/"
 Q_LOC = "/home/audrey/Documents/90055_ResearchProject/openAI_sandbox/q_tables/"
 
@@ -23,6 +25,13 @@ def open_q(env_name):
     q_name = f'{Q_LOC}{env_name}.txt'
     q_file = open(q_name, "w")
     return q_file
+
+#read_q: opens and reads the Q table, returning a numpy array that can then be used to guide an agent
+def read_q(env_name):
+    q_name = f'{Q_LOC}{env_name}.txt'
+    q_file = np.loadtxt(q_name, dtype=float)
+    return q_file
+
 
 #write_log: writes to the given log file in csv format
 def write_log(log, episode_index, action):

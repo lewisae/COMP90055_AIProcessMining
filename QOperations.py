@@ -66,5 +66,29 @@ def train_learner(Q, env, log, q_file, num_eps, epsilon, min_epsilon, decay_rate
 
             #If you want to show the game as it is being played (much slower)
             #env.render()
-            
-    q_file.write(str(Q))
+
+    for i in Q:
+        q_string = str(i).replace('[', '').replace(']', '').replace('\n', '')
+        q_file.write(q_string)
+        q_file.write("\n")
+
+
+#This function uses the trained Q table to trace the best possible path - no epsilon greedy strategy
+def trained_action(Q, state):
+    action = np.argmax(Q[state, :])
+    return action
+
+#This function goes through the environment using the trained Q table and logs all of the data
+def trained_agent(Q, log, env, num_eps):
+    for i in range(0, num_eps):
+        done = False
+        state = env.reset()
+        while not done:
+            action = trained_action(Q, state=state)
+            next_state, rew, done, info = env.step(action)
+            logging.write_log(log, i, action)
+            state = next_state
+
+            # If you want to show the game as it is being played (much slower)
+            #env.render()
+
