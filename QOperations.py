@@ -85,10 +85,12 @@ def trained_agent(Q, log, env, num_eps):
         state = env.reset()
         while not done:
             action = trained_action(Q, state=state)
+            if not env.action_space.contains(action):
+                action = env.action_space.sample()
             next_state, rew, done, info = env.step(action)
             logging.write_log(log, i, action)
             state = next_state
 
             # If you want to show the game as it is being played (much slower)
-            #env.render()
+            env.render()
 
