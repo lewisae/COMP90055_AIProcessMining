@@ -79,7 +79,7 @@ def trained_action(Q, state):
     return action
 
 #This function goes through the environment using the trained Q table and logs all of the data
-def trained_agent(Q, log, env, num_eps):
+def trained_agent(Q, log, env, env_name, num_eps):
     for i in range(0, num_eps):
         done = False
         state = env.reset()
@@ -88,9 +88,9 @@ def trained_agent(Q, log, env, num_eps):
             if not env.action_space.contains(action):
                 action = env.action_space.sample()
             next_state, rew, done, info = env.step(action)
-            logging.write_log(log, i, action)
+            logging.write_log(log, i, str(state).replace(", ", ".") + "-" + logging.convert_action(env_name, action))
             state = next_state
 
             # If you want to show the game as it is being played (much slower)
-            env.render()
+            #env.render()
 
