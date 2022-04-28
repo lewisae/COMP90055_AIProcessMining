@@ -9,12 +9,20 @@ import numpy as np
 LOG_LOC = "/home/audrey/Documents/90055_ResearchProject/openAI_sandbox/logs/"
 Q_LOC = "/home/audrey/Documents/90055_ResearchProject/openAI_sandbox/q_tables/"
 
+BLACKJACK_ACTIONS = {0:"stick", 1:"hit"}
+FROZENLAKE_ACTIONS = {0:"up", 1:"down", 2:"right", 3:"left"}
+TAXI_ACTIONS = {0:"south", 1:"north", 2:"east", 3:"west", 4:"pickup", 5:"dropoff"}
+TETRIS_ACTIONS = {}
 
 #open_log: opens and returns a txt log file at the specified location (LOG_LOC) for the specified environment name (str)
-def open_log(env_name, training=False):
+def open_log(env_name, training=False, slippery=False, state_info=False):
     # Open file in specified log location
     if training:
         env_name += "Training"
+    if slippery:
+        env_name += "Slippery"
+    if state_info:
+        env_name += "StateInfo"
     filename = f'{LOG_LOC}{env_name}{datetime.now().strftime("-%Y-%m-%d-T%H:%M:%S")}.csv'
     log = open(filename, "w")
     log.write("Index,Action,Timestamp\n")
@@ -40,3 +48,13 @@ def write_log(log, episode_index, action):
     #Write info (including current timestamp) to the log file
     log.write(f'{episode_index},{action},{current_time}\n')
 
+#convert_action: changes the actions from numerical representation to the words that correspond to those actions
+def convert_action(env_name, action):
+    if "FrozenLake" in env_name:
+        return FROZENLAKE_ACTIONS[action]
+    elif "Blackjack" in env_name:
+        return BLACKJACK_ACTIONS[action]
+    elif "Taxi" in env_name:
+        return TAXI_ACTIONS[action]
+    else:
+        return TETRIS_ACTIONS[action]

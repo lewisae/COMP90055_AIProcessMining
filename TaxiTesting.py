@@ -12,7 +12,6 @@ https://www.learndatasci.com/tutorials/reinforcement-q-learning-scratch-python-o
 '''
 
 import gym
-import numpy as np
 import LogOperations as logging
 import QOperations as ops
 
@@ -28,4 +27,4 @@ log = logging.open_log(ENV_NAME, training=False)
 Q = logging.read_q(ENV_NAME)
 
 #Run the trained agent using the provided Q table
-ops.trained_agent(Q, log, env, num_eps)
+ops.trained_agent(Q, log, env, ENV_NAME, num_eps)
