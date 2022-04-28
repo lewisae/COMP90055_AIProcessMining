@@ -83,6 +83,8 @@ def trained_agent(Q, log, env, env_name, num_eps):
     for i in range(0, num_eps):
         done = False
         state = env.reset()
+        #Initial state - write the starting action to the log
+        logging.write_log(log, i, str(state).replace(", ", ".") + "-start")
         while not done:
             action = trained_action(Q, state=state)
             if not env.action_space.contains(action):
@@ -94,3 +96,5 @@ def trained_agent(Q, log, env, env_name, num_eps):
             # If you want to show the game as it is being played (much slower)
             #env.render()
 
+        #If it is done, we log the end state as the final position
+        logging.write_log(log, i, str(state).replace(", ", ".") + "-done")
