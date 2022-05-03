@@ -17,11 +17,7 @@ import gym
 import numpy as np
 from collections import deque
 import tensorflow as tf
-from keras.models import Sequential
 from keras.layers import Dense, Flatten
-from rl.memory import SequentialMemory
-from rl.agents.dqn import DQNAgent
-from rl.policy import EpsGreedyQPolicy
 
 #Build gym environment - this is using the Arcade Learning Environment implementation of Tetris
 env = gym.make('ALE/Tetris-v5')
@@ -35,9 +31,9 @@ done = False
 '''
 
 #Set up a memory buffer using the SequentialMemory option provided for
-buffer_len = 1000
+buffer_len = 10000
 #Set a batch size for the replay function
-batch_len = 64
+batch_len = 1000
 #memory = SequentialMemory(limit=buffer_len, window_length=1)
 memory = deque(maxlen=buffer_len)
 
@@ -77,7 +73,10 @@ def select_action(state):
 
 #replay: this loads the buffer contents into the tensorflow model
 def replay():
-    batch = random.sample(memory, batch_len)
+    if len(memory) > batch_len:
+        batch = random.sample(memory, batch_len)
+    else:
+        batch = memory
     for state, action, next_state, rew, done in batch:
         if not done:
             target = rew + gamma*np.amax(model.predict(next_state)[0])
@@ -113,3 +112,7 @@ for i in range(0, num_eps):
 
     #Print out training information
     print(f'Episode {i}/{num_eps}, Score: {t}')
+
+#Save the fully trained model to then load for testing
+model.save("tetris_model.h5")
+print("Model saved successfully")

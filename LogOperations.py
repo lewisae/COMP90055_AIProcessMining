@@ -58,3 +58,25 @@ def convert_action(env_name, action):
         return TAXI_ACTIONS[action]
     else:
         return TETRIS_ACTIONS[action]
+
+#convert_reward: changes the reward from numerical representation to "win" or "lose" response
+def convert_reward(env_name, rew):
+    if "FrozenLake" in env_name:
+        if rew > 0:
+            return "win"
+        else:
+            return "lose"
+    elif "Blackjack" in env_name:
+        if rew > 0:
+            return "win"
+        elif rew < 0:
+            return "lose"
+        else:
+            return "draw"
+    elif "Taxi" in env_name:
+        if rew < 20:
+            return "lose"
+        else:
+            return "win"
+    else:
+        return str(rew)
