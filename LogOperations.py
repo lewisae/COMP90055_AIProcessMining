@@ -12,6 +12,7 @@ Q_LOC = "/home/audrey/Documents/90055_ResearchProject/openAI_sandbox/q_tables/"
 BLACKJACK_ACTIONS = {0:"stick", 1:"hit"}
 FROZENLAKE_ACTIONS = {0:"up", 1:"down", 2:"right", 3:"left"}
 TAXI_ACTIONS = {0:"south", 1:"north", 2:"east", 3:"west", 4:"pickup", 5:"dropoff"}
+TAXI_GOAL_LOCATIONS = {0:(0,0), 1:(0,4), 2:(4,0), 3:(4,3)}
 TETRIS_ACTIONS = {}
 
 #open_log: opens and returns a txt log file at the specified location (LOG_LOC) for the specified environment name (str)
@@ -80,3 +81,42 @@ def convert_reward(env_name, rew):
             return "win"
     else:
         return str(rew)
+
+#COPY of taxi decode method - taken from the open AI gym taxi documentation: https://github.com/openai/gym/blob/master/gym/envs/toy_text/taxi.py
+def decode(i):
+        out = []
+        out.append(i % 4)
+        i = i // 4
+        out.append(i % 5)
+        i = i // 5
+        out.append(i % 5)
+        i = i // 5
+        out.append(i)
+        assert 0 <= i < 5
+        return list(reversed(out))
+
+#convert_state: simplify the state information when logging
+def convert_state(env_name, state):
+    if "FrozenLake" in env_name:
+        return str(state)
+    elif "Blackjack" in env_name:
+        #Return sum of cards
+        return str(state[0])
+    elif "Taxi" in env_name:
+        decoded_state = decode(state)
+        goal_loc = 0
+        #Now we have decoded state in the form of a list - if the passenger is in the car, return the distance to the destination
+        if decoded_state[2] == 4:
+            goal_loc = 3
+        #Else, return the distance to the passenger
+        else:
+            goal_loc = 2
+        return str(manhattan_distance((decoded_state[0], decoded_state[1]), TAXI_GOAL_LOCATIONS[decoded_state[goal_loc]]))
+    else:
+        return state
+
+
+
+#manhattan distance helper function
+def manhattan_distance(taxi_loc, goal_loc):
+    return abs(taxi_loc[0] - goal_loc[0]) + abs(taxi_loc[1] - goal_loc[1])

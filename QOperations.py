@@ -65,7 +65,7 @@ def train_learner(Q, env, log, q_file, num_eps, epsilon, min_epsilon, decay_rate
             state = next_state
 
             #If you want to show the game as it is being played (much slower)
-            #env.render()
+            env.render()
 
     for i in Q:
         q_string = str(i).replace('[', '').replace(']', '').replace('\n', '')
@@ -89,12 +89,14 @@ def trained_agent(Q, log, env, env_name, num_eps):
             if not env.action_space.contains(action):
                 action = env.action_space.sample()
             next_state, rew, done, info = env.step(action)
-            logging.write_log(log, i, str(state).replace(", ", ".") + "-" + logging.convert_action(env_name, action))
+            print(logging.convert_state(env_name, state))
+            logging.write_log(log, i, logging.convert_state(env_name, state) + "-" + logging.convert_action(env_name, action))
             state = next_state
 
             # If you want to show the game as it is being played (much slower)
-            #env.render()
+            env.render()
 
         #If it is done, we log the end state as the final position
-        logging.write_log(log, i, str(state).replace(", ", ".") + "-" + str(logging.convert_reward(env_name, rew)))
+        logging.write_log(log, i, logging.convert_state(env_name, state) + "-done")
+        #logging.write_log(log, i, str(state).replace(", ", ".") + "-" + str(logging.convert_reward(env_name, rew)))
         #logging.write_log(log, i, logging.convert_reward(env_name, rew))
