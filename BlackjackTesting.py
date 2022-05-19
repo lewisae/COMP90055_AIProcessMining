@@ -22,7 +22,7 @@ ENV_NAME = "Blackjack"
 env = gym.make('Blackjack-v1')
 
 #Open logging and q table files
-num_eps = 50
+num_eps = 150
 log = logging.open_log(ENV_NAME, training=False)
 Q = logging.read_q(ENV_NAME)
 

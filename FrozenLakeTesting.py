@@ -16,13 +16,14 @@ import QOperations as ops
 
 #Environment is Frozen Lake
 ENV_NAME = "FrozenLake"
+IS_SLIPPERY = True
 
 #Build gym environment
-env = gym.make('FrozenLake-v1', is_slippery=False)
+env = gym.make('FrozenLake-v1', is_slippery=IS_SLIPPERY)
 
 #Open logging and q table files
-num_eps = 50
-log = logging.open_log(ENV_NAME, training=False, slippery=False)
+num_eps = 150
+log = logging.open_log(ENV_NAME, training=False, slippery=IS_SLIPPERY)
 Q = logging.read_q(ENV_NAME)
 
 #Run the trained agent using the provided Q table

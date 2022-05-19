@@ -41,7 +41,7 @@ decay_rate = 0.9
 min_epsilon = 0.001
 
 #Number of episodes to train model
-num_eps = 10000
+num_eps = 500000
 
 ops.train_learner(Q, env, log, q_file, num_eps, epsilon, min_epsilon, decay_rate, alpha, gamma)
 
